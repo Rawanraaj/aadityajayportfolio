@@ -47,7 +47,7 @@ export default function VideosPage() {
   }, [load]);
 
   async function toggleFeatured(v: Video) {
-    let update;
+    let update: { featured: boolean };
     if (v.featured) {
       update = { featured: false };
     } else {
