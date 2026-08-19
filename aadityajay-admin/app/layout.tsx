@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/components/auth/auth-provider';
+import CustomCursor from '@/components/CustomCursor';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="font-sans bg-background text-foreground antialiased">
+        <CustomCursor />
         <AuthProvider>
           {children}
         </AuthProvider>

@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Premium 2-layer custom cursor for Public Site (aadityajay-frontend):
- * - Layer 1: Precise press-red dot (#C81E3A) at exact mouse position (no lag).
- * - Layer 2: Trailing off-white ring (#F5F1EA) with smooth lerp easing + magnetic pull
- *   near interactive elements (links, buttons, cards).
- * - Desktop/fine-pointer only with zero layout shift and GPU transform acceleration.
+ * Admin Panel Custom Cursor (aadityajay-admin):
+ * - Snappier lerp response (0.35) for instant feedback in dense admin workflows.
+ * - Tight magnetic radius (~22px) preventing cursor jump in form fields & data tables.
+ * - Neutral/Standard cursor behavior on destructive actions (Delete, Remove, Danger buttons)
+ *   so there is zero magnetic pull risk on irreversible actions.
+ * - Desktop fine-pointer only with GPU acceleration and touch safety.
  */
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement | null>(null);
@@ -15,7 +16,7 @@ export default function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // Only enable on desktop with fine pointer and non-touch
+    // Desktop & fine-pointer check
     const finePointer = window.matchMedia("(pointer: fine)").matches;
     const isTouchDevice =
       "ontouchstart" in window || navigator.maxTouchPoints > 0;
@@ -34,23 +35,45 @@ export default function CustomCursor() {
     let ry = my;
     let rafId = 0;
 
-    // Magnetic parameters for public site
-    const MAGNETIC_RADIUS = 55;
-    const LERP_FACTOR = 0.16; // Smooth trailing lag
+    // Admin-specific tuning parameters
+    const MAGNETIC_RADIUS = 22; // Tight radius for dense admin controls
+    const LERP_FACTOR = 0.35; // Snappy responsiveness
 
     let currentTarget: HTMLElement | null = null;
     let isHovering = false;
+    let isDestructive = false;
+
+    function checkIfDestructive(el: HTMLElement): boolean {
+      if (
+        el.matches(
+          "[data-destructive], .bg-destructive, .text-destructive, [variant='destructive'], .destructive, .btn-danger"
+        )
+      ) {
+        return true;
+      }
+      const ariaLabel = (el.getAttribute("aria-label") || "").toLowerCase();
+      const title = (el.getAttribute("title") || "").toLowerCase();
+      const text = (el.textContent || "").trim().toLowerCase();
+      if (
+        ariaLabel.includes("delete") ||
+        ariaLabel.includes("remove") ||
+        title.includes("delete") ||
+        title.includes("remove") ||
+        (text.length < 20 && (text.includes("delete") || text.includes("remove")))
+      ) {
+        return true;
+      }
+      return false;
+    }
 
     function onMouseMove(e: MouseEvent) {
       mx = e.clientX;
       my = e.clientY;
 
-      // Update dot immediately (zero lag)
       if (dot) {
         dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
       }
 
-      // Check hovered element
       const target = e.target as HTMLElement | null;
       if (target) {
         const interactive = target.closest<HTMLElement>(
@@ -58,6 +81,12 @@ export default function CustomCursor() {
         );
         currentTarget = interactive;
         isHovering = !!interactive;
+
+        if (interactive) {
+          isDestructive = checkIfDestructive(interactive);
+        } else {
+          isDestructive = false;
+        }
       }
     }
 
@@ -77,7 +106,8 @@ export default function CustomCursor() {
       let scale = 1;
       let isMagneticActive = false;
 
-      if (currentTarget) {
+      // Disable magnetic pull completely if hovering a destructive element
+      if (currentTarget && !isDestructive) {
         const rect = currentTarget.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
@@ -85,27 +115,31 @@ export default function CustomCursor() {
 
         if (dist < MAGNETIC_RADIUS) {
           isMagneticActive = true;
-          const pullStrength = (1 - dist / MAGNETIC_RADIUS) * 0.42;
+          const pullStrength = (1 - dist / MAGNETIC_RADIUS) * 0.3;
           targetX = mx + (centerX - mx) * pullStrength;
           targetY = my + (centerY - my) * pullStrength;
-          scale = 1.45;
+          scale = 1.25;
         }
       }
 
-      // Lerp ring towards target
+      // Snappy lerp
       rx += (targetX - rx) * LERP_FACTOR;
       ry += (targetY - ry) * LERP_FACTOR;
 
       if (ring) {
         ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) scale(${
-          isHovering || isMagneticActive ? scale : 1
+          isHovering ? scale : 1
         })`;
 
-        if (isHovering || isMagneticActive) {
-          ring.style.borderColor = "rgba(200, 30, 58, 0.9)";
-          ring.style.backgroundColor = "rgba(200, 30, 58, 0.12)";
+        if (isDestructive) {
+          // Destructive element hover: alert red ring without magnetic pull
+          ring.style.borderColor = "rgba(220, 38, 38, 0.8)";
+          ring.style.backgroundColor = "rgba(220, 38, 38, 0.08)";
+        } else if (isHovering || isMagneticActive) {
+          ring.style.borderColor = "rgba(200, 30, 58, 0.85)";
+          ring.style.backgroundColor = "rgba(200, 30, 58, 0.1)";
         } else {
-          ring.style.borderColor = "rgba(245, 241, 234, 0.4)";
+          ring.style.borderColor = "rgba(240, 235, 225, 0.35)";
           ring.style.backgroundColor = "transparent";
         }
       }
@@ -135,18 +169,18 @@ export default function CustomCursor() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden"
     >
-      {/* Precise red dot (no lag) */}
+      {/* Precision center dot */}
       <div
         ref={dotRef}
-        className="pointer-events-none absolute top-0 left-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c81e3a] transition-opacity duration-300 will-change-transform shadow-[0_0_8px_rgba(200,30,58,0.8)]"
+        className="pointer-events-none absolute top-0 left-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c81e3a] transition-opacity duration-200 will-change-transform shadow-[0_0_6px_rgba(200,30,58,0.7)]"
         style={{ marginLeft: "-3px", marginTop: "-3px" }}
       />
 
-      {/* Trailing off-white ring with smooth lerp & magnetic expansion */}
+      {/* Responsive ring */}
       <div
         ref={ringRef}
-        className="pointer-events-none absolute top-0 left-0 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(245,241,234,0.4)] transition-[background-color,border-color,opacity] duration-300 will-change-transform"
-        style={{ marginLeft: "-14px", marginTop: "-14px" }}
+        className="pointer-events-none absolute top-0 left-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(240,235,225,0.35)] transition-[background-color,border-color,opacity] duration-200 will-change-transform"
+        style={{ marginLeft: "-10px", marginTop: "-10px" }}
       />
     </div>
   );

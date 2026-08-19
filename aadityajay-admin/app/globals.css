@@ -154,3 +154,12 @@
 .dragging {
   cursor: grabbing !important;
 }
+
+/* Hide native cursor on desktop fine pointer when custom cursor is active */
+@media (pointer: fine) {
+  body.cursors-enabled,
+  body.cursors-enabled * {
+    cursor: none !important;
+  }
+}
+
