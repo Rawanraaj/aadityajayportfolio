@@ -25,21 +25,25 @@ export default function SmoothScroll({
       touchMultiplier: 1.6,
     });
 
-    // drive ScrollTrigger from Lenis
-    lenis.on("scroll", ScrollTrigger.update);
-    const onRaf = (time: number) => {
+    // 1. Update ScrollTrigger on Lenis scroll
+    lenis.on("scroll", () => {
+      ScrollTrigger.update();
+    });
+
+    // 2. Sync Lenis document height with ScrollTrigger refreshes
+    const onScrollTriggerRefresh = () => {
+      lenis.resize();
+    };
+    ScrollTrigger.addEventListener("refresh", onScrollTriggerRefresh);
+
+    // 3. Drive Lenis solely via GSAP Ticker (single unified RAF source)
+    const updateLenis = (time: number) => {
       lenis.raf(time * 1000);
     };
-    gsap.ticker.add(onRaf);
+    gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
-    let frame = 0;
-    function raf(time: number) {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    }
-    frame = requestAnimationFrame(raf);
-
+    // 4. Smooth scroll for anchor links
     function handleAnchor(e: Event) {
       const target = e.target as HTMLElement;
       const link = target.closest('a[href^="#"]') as HTMLAnchorElement | null;
@@ -53,17 +57,33 @@ export default function SmoothScroll({
     }
     document.addEventListener("click", handleAnchor);
 
-    // recalc triggers after images/fonts settle
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener("load", refresh);
-    const refreshTimer = window.setTimeout(refresh, 600);
+    // 5. Recalculate document dimensions dynamically when content/images/fonts change
+    const refreshAll = () => {
+      lenis.resize();
+      ScrollTrigger.refresh();
+    };
+
+    window.addEventListener("load", refreshAll);
+    const refreshTimer = setTimeout(refreshAll, 600);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        lenis.resize();
+        ScrollTrigger.refresh();
+      });
+      resizeObserver.observe(document.body);
+    }
 
     return () => {
-      cancelAnimationFrame(frame);
-      gsap.ticker.remove(onRaf);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      clearTimeout(refreshTimer);
+      window.removeEventListener("load", refreshAll);
       document.removeEventListener("click", handleAnchor);
-      window.removeEventListener("load", refresh);
-      window.clearTimeout(refreshTimer);
+      ScrollTrigger.removeEventListener("refresh", onScrollTriggerRefresh);
+      gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
   }, []);
