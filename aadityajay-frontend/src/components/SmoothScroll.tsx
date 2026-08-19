@@ -25,25 +25,19 @@ export default function SmoothScroll({
       touchMultiplier: 1.6,
     });
 
-    // 1. Update ScrollTrigger on Lenis scroll
+    // 1. Update ScrollTrigger position on Lenis scroll
     lenis.on("scroll", () => {
       ScrollTrigger.update();
     });
 
-    // 2. Sync Lenis document height with ScrollTrigger refreshes
-    const onScrollTriggerRefresh = () => {
-      lenis.resize();
-    };
-    ScrollTrigger.addEventListener("refresh", onScrollTriggerRefresh);
-
-    // 3. Drive Lenis solely via GSAP Ticker (single unified RAF source)
+    // 2. Drive Lenis purely via GSAP Ticker
     const updateLenis = (time: number) => {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
-    // 4. Smooth scroll for anchor links
+    // 3. Smooth scroll for anchor links
     function handleAnchor(e: Event) {
       const target = e.target as HTMLElement;
       const link = target.closest('a[href^="#"]') as HTMLAnchorElement | null;
@@ -57,32 +51,19 @@ export default function SmoothScroll({
     }
     document.addEventListener("click", handleAnchor);
 
-    // 5. Recalculate document dimensions dynamically when content/images/fonts change
-    const refreshAll = () => {
-      lenis.resize();
+    // 4. One-time refresh after layout & images settle
+    const refreshLayout = () => {
       ScrollTrigger.refresh();
+      lenis.resize();
     };
 
-    window.addEventListener("load", refreshAll);
-    const refreshTimer = setTimeout(refreshAll, 600);
-
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(() => {
-        lenis.resize();
-        ScrollTrigger.refresh();
-      });
-      resizeObserver.observe(document.body);
-    }
+    window.addEventListener("load", refreshLayout);
+    const timer = setTimeout(refreshLayout, 1000);
 
     return () => {
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
-      clearTimeout(refreshTimer);
-      window.removeEventListener("load", refreshAll);
+      clearTimeout(timer);
+      window.removeEventListener("load", refreshLayout);
       document.removeEventListener("click", handleAnchor);
-      ScrollTrigger.removeEventListener("refresh", onScrollTriggerRefresh);
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
