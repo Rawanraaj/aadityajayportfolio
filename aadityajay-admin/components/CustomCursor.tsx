@@ -26,9 +26,6 @@ export default function CustomCursor() {
     setEnabled(true);
     document.body.classList.add("cursors-enabled");
 
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-
     let mx = window.innerWidth / 2;
     let my = window.innerHeight / 2;
     let rx = mx;
@@ -70,6 +67,8 @@ export default function CustomCursor() {
       mx = e.clientX;
       my = e.clientY;
 
+      // Dynamic ref lookup ensures non-null access on every frame
+      const dot = dotRef.current;
       if (dot) {
         dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
       }
@@ -91,11 +90,15 @@ export default function CustomCursor() {
     }
 
     function onMouseLeave() {
+      const dot = dotRef.current;
+      const ring = ringRef.current;
       if (dot) dot.style.opacity = "0";
       if (ring) ring.style.opacity = "0";
     }
 
     function onMouseEnter() {
+      const dot = dotRef.current;
+      const ring = ringRef.current;
       if (dot) dot.style.opacity = "1";
       if (ring) ring.style.opacity = "1";
     }
@@ -126,6 +129,7 @@ export default function CustomCursor() {
       rx += (targetX - rx) * LERP_FACTOR;
       ry += (targetY - ry) * LERP_FACTOR;
 
+      const ring = ringRef.current;
       if (ring) {
         ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) scale(${
           isHovering ? scale : 1
@@ -162,25 +166,57 @@ export default function CustomCursor() {
     };
   }, []);
 
-  if (!enabled) return null;
-
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden"
+      style={{
+        display: enabled ? "block" : "none",
+        pointerEvents: "none",
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        overflow: "hidden",
+      }}
     >
       {/* Precision center dot */}
       <div
         ref={dotRef}
-        className="pointer-events-none absolute top-0 left-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c81e3a] transition-opacity duration-200 will-change-transform shadow-[0_0_6px_rgba(200,30,58,0.7)]"
-        style={{ marginLeft: "-3px", marginTop: "-3px" }}
+        style={{
+          pointerEvents: "none",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "5px",
+          height: "5px",
+          marginLeft: "-2.5px",
+          marginTop: "-2.5px",
+          borderRadius: "50%",
+          backgroundColor: "#c81e3a",
+          boxShadow: "0 0 6px rgba(200, 30, 58, 0.7)",
+          willChange: "transform",
+          transition: "opacity 200ms ease",
+        }}
       />
 
       {/* Responsive ring */}
       <div
         ref={ringRef}
-        className="pointer-events-none absolute top-0 left-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(240,235,225,0.35)] transition-[background-color,border-color,opacity] duration-200 will-change-transform"
-        style={{ marginLeft: "-10px", marginTop: "-10px" }}
+        style={{
+          pointerEvents: "none",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "20px",
+          height: "20px",
+          marginLeft: "-10px",
+          marginTop: "-10px",
+          borderRadius: "50%",
+          border: "1.5px solid rgba(240, 235, 225, 0.35)",
+          backgroundColor: "transparent",
+          willChange: "transform",
+          transition:
+            "background-color 200ms ease, border-color 200ms ease, opacity 200ms ease",
+        }}
       />
     </div>
   );

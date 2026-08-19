@@ -25,9 +25,6 @@ export default function CustomCursor() {
     setEnabled(true);
     document.body.classList.add("cursors-enabled");
 
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-
     let mx = window.innerWidth / 2;
     let my = window.innerHeight / 2;
     let rx = mx;
@@ -45,7 +42,8 @@ export default function CustomCursor() {
       mx = e.clientX;
       my = e.clientY;
 
-      // Update dot immediately (zero lag)
+      // Dynamic ref lookup ensures non-null access on every frame
+      const dot = dotRef.current;
       if (dot) {
         dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
       }
@@ -62,11 +60,15 @@ export default function CustomCursor() {
     }
 
     function onMouseLeave() {
+      const dot = dotRef.current;
+      const ring = ringRef.current;
       if (dot) dot.style.opacity = "0";
       if (ring) ring.style.opacity = "0";
     }
 
     function onMouseEnter() {
+      const dot = dotRef.current;
+      const ring = ringRef.current;
       if (dot) dot.style.opacity = "1";
       if (ring) ring.style.opacity = "1";
     }
@@ -96,6 +98,7 @@ export default function CustomCursor() {
       rx += (targetX - rx) * LERP_FACTOR;
       ry += (targetY - ry) * LERP_FACTOR;
 
+      const ring = ringRef.current;
       if (ring) {
         ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) scale(${
           isHovering || isMagneticActive ? scale : 1
@@ -128,25 +131,57 @@ export default function CustomCursor() {
     };
   }, []);
 
-  if (!enabled) return null;
-
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden"
+      style={{
+        display: enabled ? "block" : "none",
+        pointerEvents: "none",
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        overflow: "hidden",
+      }}
     >
       {/* Precise red dot (no lag) */}
       <div
         ref={dotRef}
-        className="pointer-events-none absolute top-0 left-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c81e3a] transition-opacity duration-300 will-change-transform shadow-[0_0_8px_rgba(200,30,58,0.8)]"
-        style={{ marginLeft: "-3px", marginTop: "-3px" }}
+        style={{
+          pointerEvents: "none",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "6px",
+          height: "6px",
+          marginLeft: "-3px",
+          marginTop: "-3px",
+          borderRadius: "50%",
+          backgroundColor: "#c81e3a",
+          boxShadow: "0 0 8px rgba(200, 30, 58, 0.8)",
+          willChange: "transform",
+          transition: "opacity 300ms ease",
+        }}
       />
 
       {/* Trailing off-white ring with smooth lerp & magnetic expansion */}
       <div
         ref={ringRef}
-        className="pointer-events-none absolute top-0 left-0 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(245,241,234,0.4)] transition-[background-color,border-color,opacity] duration-300 will-change-transform"
-        style={{ marginLeft: "-14px", marginTop: "-14px" }}
+        style={{
+          pointerEvents: "none",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "28px",
+          height: "28px",
+          marginLeft: "-14px",
+          marginTop: "-14px",
+          borderRadius: "50%",
+          border: "1.5px solid rgba(245, 241, 234, 0.4)",
+          backgroundColor: "transparent",
+          willChange: "transform",
+          transition:
+            "background-color 300ms ease, border-color 300ms ease, opacity 300ms ease",
+        }}
       />
     </div>
   );
