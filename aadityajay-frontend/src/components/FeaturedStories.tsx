@@ -116,10 +116,10 @@ export default function FeaturedStories({ articles = featuredArticles }: Feature
       </div>
 
       {/* Desktop: pinned horizontal gallery. Mobile: vertical stack. */}
-      <div ref={pinRef} className="relative h-auto w-full md:h-[100svh] md:min-h-[560px]">
+      <div ref={pinRef} className="relative h-auto w-full md:h-[100svh] md:max-h-[100svh] md:min-h-[560px] md:overflow-hidden">
         <div
           ref={trackRef}
-          className="flex flex-col gap-6 px-6 pb-24 md:absolute md:left-0 md:top-1/2 md:flex-row md:-translate-y-1/2 md:items-center md:gap-10 md:px-10 md:pb-0 will-change-transform"
+          className="flex flex-col gap-6 px-6 pb-24 md:absolute md:left-0 md:top-1/2 md:flex-row md:flex-nowrap md:w-max md:h-auto md:-translate-y-1/2 md:items-center md:gap-10 md:px-10 md:pb-0 will-change-transform"
         >
           {filtered.length === 0 ? (
             <div className="flex h-[60svh] items-center justify-center md:h-auto">
