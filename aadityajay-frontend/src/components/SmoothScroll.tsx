@@ -65,10 +65,13 @@ export default function SmoothScroll({
 
       if (currentScrollHeight > targetHeight + 50) {
         document.body.style.maxHeight = `${targetHeight}px`;
+        document.body.style.overflow = "hidden";
         document.documentElement.style.maxHeight = `${targetHeight}px`;
+        document.documentElement.style.overflow = "hidden";
         const main = document.querySelector("main");
         if (main) {
           main.style.maxHeight = `${targetHeight}px`;
+          main.style.overflow = "hidden";
         }
         lenis.resize();
       }
@@ -103,9 +106,14 @@ export default function SmoothScroll({
       document.removeEventListener("click", handleAnchor);
       ScrollTrigger.removeEventListener("refresh", clampScrollHeight);
       document.body.style.maxHeight = "";
+      document.body.style.overflow = "";
       document.documentElement.style.maxHeight = "";
+      document.documentElement.style.overflow = "";
       const main = document.querySelector("main");
-      if (main) main.style.maxHeight = "";
+      if (main) {
+        main.style.maxHeight = "";
+        main.style.overflow = "";
+      }
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
