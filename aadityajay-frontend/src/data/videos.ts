@@ -4,9 +4,10 @@ export type VideoItem = {
   outlet: string;
   date: string;
   duration: string;
-  /** Pexels still used as the poster thumbnail (no meme content) */
+  /** Pexels or custom/youtube poster thumbnail */
   poster: string;
   youtubeId: string;
+  featured?: boolean;
 };
 
 export type Video = VideoItem;

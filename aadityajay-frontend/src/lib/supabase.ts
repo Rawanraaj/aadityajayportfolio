@@ -176,26 +176,41 @@ export async function getVideos(): Promise<Video[]> {
     const { data, error } = await supabase
       .from("videos")
       .select("*")
+      .order("featured", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error || !data || data.length === 0) {
       return staticVideos;
     }
 
-    return data.map((item: any) => ({
-      id: item.id?.toString() || `vid-${Date.now()}`,
-      title: item.title || "Broadcast Video",
-      category: item.category || "TV Interview",
-      duration: item.duration || "10:00",
-      date: item.date || "2025",
-      outlet: item.outlet || "Public Khabar 24",
-      youtubeId: item.youtube_id || item.youtubeId || "dQw4w9WgXcQ",
-      poster:
+    return data.map((item: any) => {
+      const yId = item.youtube_id || item.youtubeId || "scMbinQ6w2M";
+      const posterUrl =
+        item.thumbnail_override ||
+        item.thumbnail_url ||
         item.poster ||
-        item.thumbnail ||
-        `https://img.youtube.com/vi/${item.youtube_id || item.youtubeId || "dQw4w9WgXcQ"}/hqdefault.jpg`,
-      description: item.description || "",
-    }));
+        `https://img.youtube.com/vi/${yId}/maxresdefault.jpg`;
+
+      const formattedDate = item.published_at
+        ? new Date(item.published_at).toLocaleDateString("en-US", {
+            month: "short",
+            year: "numeric",
+          })
+        : item.date || "2025";
+
+      return {
+        id: item.id?.toString() || `vid-${Date.now()}`,
+        title: item.title || "Broadcast Video",
+        category: item.category || "Live Segment",
+        duration: item.duration || "10:00",
+        date: formattedDate,
+        outlet: item.outlet || `Public Khabar 24 · ${item.category || "Broadcast"}`,
+        youtubeId: yId,
+        poster: posterUrl,
+        featured: Boolean(item.featured),
+        description: item.description || "",
+      };
+    });
   } catch (err) {
     return staticVideos;
   }

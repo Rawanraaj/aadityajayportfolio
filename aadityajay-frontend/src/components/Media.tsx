@@ -20,7 +20,8 @@ export default function Media({ videoList = videos }: MediaProps) {
   const root = useRef<HTMLElement | null>(null);
 
   const activeVideos = videoList && videoList.length > 0 ? videoList : videos;
-  const [featured, ...supporting] = activeVideos;
+  const featured = activeVideos.find((v) => v.featured) || activeVideos[0];
+  const supporting = activeVideos.filter((v) => v.id !== featured.id);
 
   useEffect(() => {
     if (!activeVideos || activeVideos.length === 0) return;
