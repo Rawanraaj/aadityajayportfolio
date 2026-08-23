@@ -133,10 +133,11 @@ export default function Hero({
       >
         <div className="relative h-full w-full">
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover"
             style={{
               backgroundImage: `url('${activePhoto}')`,
-              filter: "grayscale(0.35) contrast(1.12) brightness(0.82)",
+              backgroundPosition: "center top",
+              filter: "contrast(1.03) brightness(0.98)",
               clipPath: "polygon(6% 0, 100% 0, 100% 94%, 0 100%)",
             }}
           />
@@ -144,7 +145,7 @@ export default function Hero({
             className="absolute inset-0 mix-blend-overlay"
             style={{
               background:
-                "linear-gradient(125deg, rgba(245,241,234,0.22) 0%, transparent 45%), linear-gradient(280deg, rgba(7,11,20,0.7) 60%, transparent 100%)",
+                "linear-gradient(125deg, rgba(245,241,234,0.12) 0%, transparent 45%), linear-gradient(280deg, rgba(7,11,20,0.25) 60%, transparent 100%)",
               clipPath: "polygon(6% 0, 100% 0, 100% 94%, 0 100%)",
             }}
           />
