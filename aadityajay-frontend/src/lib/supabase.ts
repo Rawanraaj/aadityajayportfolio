@@ -13,6 +13,57 @@ const supabaseAnonKey =
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export type HeroData = {
+  tagline: string;
+  heroPhotoUrl: string | null;
+  stats: { value: number; suffix: string; label: string }[];
+};
+
+/**
+ * Fetch hero singleton from Supabase.
+ * Returns static fallback if query fails or row is empty.
+ */
+export async function getHeroData(): Promise<HeroData> {
+  try {
+    const { data, error } = await supabase
+      .from("hero")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error || !data) {
+      console.warn("Supabase hero query failed or empty, using fallback data.");
+      return {
+        tagline: staticSite.tagline,
+        heroPhotoUrl: null,
+        stats: staticHeroStats,
+      };
+    }
+
+    const stats = [
+      { value: data.stat_years || 0, suffix: "+", label: "Years Reporting" },
+      { value: data.stat_stories || 0, suffix: "+", label: "Stories Published" },
+      { value: data.stat_recognitions || 0, suffix: "", label: "National Recognitions" },
+    ];
+
+    // Only use Supabase stats if they have real values (not all zeros from seed row)
+    const hasRealStats = stats.some((s) => s.value > 0);
+
+    return {
+      tagline: data.tagline || staticSite.tagline,
+      heroPhotoUrl: data.hero_photo_url || null,
+      stats: hasRealStats ? stats : staticHeroStats,
+    };
+  } catch (err) {
+    console.error("Error fetching hero data from Supabase:", err);
+    return {
+      tagline: staticSite.tagline,
+      heroPhotoUrl: null,
+      stats: staticHeroStats,
+    };
+  }
+}
+
 /**
  * Fetch published articles from Supabase.
  * Returns static fallback if Supabase query fails or returns empty set.
@@ -184,14 +235,15 @@ export async function getTickerItems(): Promise<string[]> {
   try {
     const { data, error } = await supabase
       .from("ticker")
-      .select("text, headline, active")
-      .eq("active", true);
+      .select("text, is_active, order")
+      .eq("is_active", true)
+      .order("order", { ascending: true });
 
     if (error || !data || data.length === 0) {
       return staticTickerItems;
     }
 
-    return data.map((item: any) => item.headline || item.text).filter(Boolean);
+    return data.map((item: any) => item.text).filter(Boolean);
   } catch (err) {
     return staticTickerItems;
   }

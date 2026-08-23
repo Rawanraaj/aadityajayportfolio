@@ -9,6 +9,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
 import {
+  getHeroData,
   getPublishedArticles,
   getVideos,
   getAchievements,
@@ -18,17 +19,19 @@ import {
 export const revalidate = 120; // Incremental Static Regeneration every 2 minutes
 
 export default async function Page() {
-  const [articles, videosList, achievementItems, tickerList] = await Promise.all([
-    getPublishedArticles(),
-    getVideos(),
-    getAchievements(),
-    getTickerItems(),
-  ]);
+  const [heroData, articles, videosList, achievementItems, tickerList] =
+    await Promise.all([
+      getHeroData(),
+      getPublishedArticles(),
+      getVideos(),
+      getAchievements(),
+      getTickerItems(),
+    ]);
 
   return (
     <main className="relative">
       <Navbar />
-      <Hero tickerList={tickerList} />
+      <Hero heroData={heroData} tickerList={tickerList} />
       <About />
       <FeaturedStories articles={articles} />
       <Media videoList={videosList} />

@@ -7,15 +7,27 @@ import { heroStats, site } from "@/data/site";
 import { tickerItems } from "@/data/nav";
 import Marquee from "@/components/Marquee";
 
+import { HeroData } from "@/lib/supabase";
+
 interface HeroProps {
   tickerList?: string[];
   stats?: typeof heroStats;
+  heroData?: HeroData;
 }
 
-export default function Hero({ tickerList = tickerItems, stats = heroStats }: HeroProps) {
+export default function Hero({
+  tickerList = tickerItems,
+  stats,
+  heroData,
+}: HeroProps) {
   const root = useRef<HTMLElement | null>(null);
 
-  const activeStats = stats && stats.length > 0 ? stats : heroStats;
+  const activeTagline = heroData?.tagline || site.tagline;
+  const activePhoto =
+    heroData?.heroPhotoUrl ||
+    "https://images.pexels.com/photos/8961065/pexels-photo-8961065.jpeg?auto=compress&cs=tinysrgb&w=1200";
+  const activeStats =
+    heroData?.stats || (stats && stats.length > 0 ? stats : heroStats);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -123,8 +135,7 @@ export default function Hero({ tickerList = tickerItems, stats = heroStats }: He
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage:
-                "url('https://images.pexels.com/photos/8961065/pexels-photo-8961065.jpeg?auto=compress&cs=tinysrgb&w=1200')",
+              backgroundImage: `url('${activePhoto}')`,
               filter: "grayscale(0.35) contrast(1.12) brightness(0.82)",
               clipPath: "polygon(6% 0, 100% 0, 100% 94%, 0 100%)",
             }}
@@ -177,14 +188,14 @@ export default function Hero({ tickerList = tickerItems, stats = heroStats }: He
           >
             <span className="font-display text-base italic text-press md:text-xl">{site.role}</span>
             <span className="hidden h-4 w-px bg-paper-50/30 md:block" />
-            <p className="max-w-md text-sm leading-relaxed text-paper-50/70">{site.tagline}</p>
+            <p className="max-w-md text-sm leading-relaxed text-paper-50/70">{activeTagline}</p>
           </div>
 
           <div
             data-hero-fade
             className="mt-8 grid max-w-lg grid-cols-3 gap-3 border-t border-paper-50/15 pt-5 md:mt-10 md:gap-4 md:pt-6"
           >
-            {heroStats.map((stat) => (
+            {activeStats.map((stat) => (
               <div key={stat.label} className="flex flex-col">
                 <span className="font-display text-2xl font-bold text-paper-50 md:text-4xl">
                   {stat.value}
