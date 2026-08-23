@@ -38,11 +38,12 @@ export async function getPublishedArticles(): Promise<Article[]> {
       date: item.published_at || item.date || "2025",
       readTime: item.read_time || item.readTime || "7 min read",
       image:
+        item.thumbnail_url ||
         item.image_url ||
         item.image ||
         "https://images.pexels.com/photos/6621337/pexels-photo-6621337.jpeg?auto=compress&cs=tinysrgb&w=1200",
       featured: Boolean(item.featured),
-      href: `/stories/${item.id || item.slug}`,
+      href: item.external_link || `/stories/${item.id || item.slug}`,
       viewCount: item.view_count || 0,
     }));
   } catch (err) {
@@ -76,11 +77,12 @@ export async function getArticleById(id: string): Promise<Article | null> {
       date: data.published_at || data.date || "2025",
       readTime: data.read_time || "7 min read",
       image:
+        data.thumbnail_url ||
         data.image_url ||
         data.image ||
         "https://images.pexels.com/photos/6621337/pexels-photo-6621337.jpeg?auto=compress&cs=tinysrgb&w=1200",
       featured: Boolean(data.featured),
-      href: `/stories/${data.id || id}`,
+      href: data.external_link || `/stories/${data.id || id}`,
       viewCount: data.view_count || 0,
     };
   } catch (err) {

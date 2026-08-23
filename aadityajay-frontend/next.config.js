@@ -5,6 +5,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.pexels.com" },
       { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "www.publickhabar24.com" },
+      { protocol: "https", hostname: "publickhabar24.com" },
     ],
   },
 };
