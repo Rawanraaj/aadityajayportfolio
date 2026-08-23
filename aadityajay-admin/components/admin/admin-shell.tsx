@@ -30,7 +30,7 @@ const NAV = [
   { label: 'Hero', href: '/admin/hero', icon: ImageIcon },
   { label: 'Ticker', href: '/admin/ticker', icon: Megaphone },
   { label: 'Inquiries', href: '/admin/inquiries', icon: Inbox },
-  { label: 'Audit Log', href: '/admin/audit', icon: ScrollText },
+  { label: 'Audit Log', href: '/admin/audit-log', icon: ScrollText },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
