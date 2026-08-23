@@ -2,6 +2,7 @@
 
 import { site } from "@/data/site";
 import { navLinks } from "@/data/nav";
+import SocialIcons from "@/components/SocialIcons";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -35,47 +36,26 @@ export default function Footer() {
           </div>
 
           <div className="col-span-6 md:col-span-3">
-            <div className="eyebrow mb-4 text-paper-50/45">Elsewhere</div>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href={site.outletSite}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-paper-50/70 transition-colors hover:text-press"
-                >
-                  Public Khabar 24 →
-                </a>
-              </li>
-              <li>
-                <a
-                  href={site.socials.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-paper-50/70 transition-colors hover:text-press"
-                >
-                  Facebook
-                </a>
-              </li>
-              <li>
-                <a
-                  href={site.socials.twitter}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-paper-50/70 transition-colors hover:text-press"
-                >
-                  X / Twitter
-                </a>
-              </li>
-              <li>
+            <div className="eyebrow mb-4 text-paper-50/45">Connect</div>
+            <div className="space-y-4">
+              <a
+                href={site.outletSite}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block text-sm text-paper-50/70 transition-colors hover:text-press font-medium"
+              >
+                Public Khabar 24 →
+              </a>
+              <SocialIcons className="flex flex-wrap gap-2 pt-1" />
+              <div>
                 <a
                   href={`mailto:${site.email}`}
-                  className="text-sm text-paper-50/70 transition-colors hover:text-press"
+                  className="text-xs font-mono text-paper-50/60 transition-colors hover:text-press"
                 >
                   {site.email}
                 </a>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
 

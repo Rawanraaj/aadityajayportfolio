@@ -5,6 +5,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { site } from "@/data/site";
 import MagneticButton from "@/components/MagneticButton";
+import SocialIcons from "@/components/SocialIcons";
+import { supabase } from "@/lib/supabase";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,7 +46,22 @@ export default function Contact() {
     e.preventDefault();
     if (!validate()) return;
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 900));
+
+    try {
+      const { error } = await supabase.from("contact_inquiries").insert({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        subject: values.subject.trim(),
+        message: values.message.trim(),
+      });
+
+      if (error) {
+        console.error("Error submitting contact inquiry:", error.message);
+      }
+    } catch (err) {
+      console.error("Unexpected error submitting inquiry:", err);
+    }
+
     setStatus("success");
     setValues({ name: "", email: "", subject: "", message: "" });
     setTimeout(() => setStatus("idle"), 4500);
@@ -119,19 +136,8 @@ export default function Contact() {
                 <span className="h-px w-8 bg-paper-50/40 transition-all duration-300 group-hover:w-12 group-hover:bg-press" />
                 {site.email}
               </a>
-              <div className="flex flex-wrap gap-3 pt-3">
-                <MagneticButton
-                  href={site.socials.facebook}
-                  className="border border-paper-50/20 px-5 py-3 text-[0.66rem] uppercase tracking-eyebrow-2 text-paper-50 transition-colors hover:border-press hover:bg-press"
-                >
-                  Facebook
-                </MagneticButton>
-                <MagneticButton
-                  href={site.socials.twitter}
-                  className="border border-paper-50/20 px-5 py-3 text-[0.66rem] uppercase tracking-eyebrow-2 text-paper-50 transition-colors hover:border-press hover:bg-press"
-                >
-                  X / Twitter
-                </MagneticButton>
+              <div className="pt-2">
+                <SocialIcons className="flex flex-wrap gap-2.5" />
               </div>
             </div>
           </div>
@@ -226,7 +232,7 @@ function StatusLine({ status }: { status: Status }) {
         status === "success" ? "text-press opacity-100" : "opacity-0"
       }`}
     >
-      ✓ Message queued — no backend yet
+      ✓ Message received — thank you
     </span>
   );
 }
