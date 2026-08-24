@@ -51,44 +51,15 @@ export default function SmoothScroll({
     }
     document.addEventListener("click", handleAnchor);
 
-    // 4. Hard Safety-Net Clamp on Page Scroll Height
-    const clampScrollHeight = () => {
-      const footer = document.querySelector("footer");
-      if (!footer) return;
-
-      const footerBottom = footer.getBoundingClientRect().bottom + window.scrollY;
-      const targetHeight = Math.ceil(footerBottom + 20); // 20px safety buffer
-      const currentScrollHeight = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-      );
-
-      if (currentScrollHeight > targetHeight + 50) {
-        document.body.style.maxHeight = `${targetHeight}px`;
-        document.body.style.overflow = "hidden";
-        document.documentElement.style.maxHeight = `${targetHeight}px`;
-        document.documentElement.style.overflow = "hidden";
-        const main = document.querySelector("main");
-        if (main) {
-          main.style.maxHeight = `${targetHeight}px`;
-          main.style.overflow = "hidden";
-        }
-        lenis.resize();
-      }
-    };
-
-    // 5. Layout refresh & clamp triggers
+    // 4. Layout refresh & Lenis resize triggers
     const refreshLayout = () => {
       ScrollTrigger.refresh();
       lenis.resize();
-      clampScrollHeight();
     };
 
     window.addEventListener("load", refreshLayout);
     const timer1 = setTimeout(refreshLayout, 500);
     const timer2 = setTimeout(refreshLayout, 1500);
-
-    ScrollTrigger.addEventListener("refresh", clampScrollHeight);
 
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
@@ -104,16 +75,6 @@ export default function SmoothScroll({
       window.removeEventListener("load", refreshLayout);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("click", handleAnchor);
-      ScrollTrigger.removeEventListener("refresh", clampScrollHeight);
-      document.body.style.maxHeight = "";
-      document.body.style.overflow = "";
-      document.documentElement.style.maxHeight = "";
-      document.documentElement.style.overflow = "";
-      const main = document.querySelector("main");
-      if (main) {
-        main.style.maxHeight = "";
-        main.style.overflow = "";
-      }
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
