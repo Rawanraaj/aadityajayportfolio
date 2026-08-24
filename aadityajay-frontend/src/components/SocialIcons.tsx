@@ -2,36 +2,30 @@
 
 import React from "react";
 
-// TODO: Replace with real social media URLs before final launch
 export const socialLinks = [
   {
     name: "Facebook",
-    href: "https://facebook.com/PLACEHOLDER",
+    href: "https://www.facebook.com/share/1K15Scqmwp/",
     icon: FacebookIcon,
   },
   {
-    name: "X (Twitter)",
-    href: "https://x.com/PLACEHOLDER",
-    icon: XIcon,
-  },
-  {
     name: "Instagram",
-    href: "https://instagram.com/PLACEHOLDER",
+    href: "https://www.instagram.com/aaditya_ajay/",
     icon: InstagramIcon,
   },
   {
     name: "YouTube",
-    href: "https://youtube.com/@PLACEHOLDER",
+    href: "https://www.youtube.com/@publickhabar2463",
     icon: YouTubeIcon,
   },
   {
     name: "TikTok",
-    href: "https://tiktok.com/@PLACEHOLDER",
+    href: "https://www.tiktok.com/@aadityaajay07",
     icon: TikTokIcon,
   },
   {
     name: "WhatsApp",
-    href: "https://wa.me/PLACEHOLDER",
+    href: "https://wa.me/9779816846265",
     icon: WhatsAppIcon,
   },
 ];
