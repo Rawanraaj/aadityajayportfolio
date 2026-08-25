@@ -47,16 +47,34 @@ export default function Contact() {
     if (!validate()) return;
     setStatus("loading");
 
+    const payload = {
+      name: values.name.trim(),
+      email: values.email.trim(),
+      subject: values.subject.trim(),
+      message: values.message.trim(),
+    };
+
     try {
-      const { error } = await supabase.from("contact_inquiries").insert({
-        name: values.name.trim(),
-        email: values.email.trim(),
-        subject: values.subject.trim(),
-        message: values.message.trim(),
-      });
+      const { error } = await supabase.from("contact_inquiries").insert(payload);
 
       if (error) {
         console.error("Error submitting contact inquiry:", error.message);
+      } else {
+        // Direct server-side call to Next.js API route for email dispatch
+        fetch("/api/notify-inquiry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const data = await res.json().catch(() => ({}));
+              console.error("Error from /api/notify-inquiry:", data);
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to call /api/notify-inquiry:", err);
+          });
       }
     } catch (err) {
       console.error("Unexpected error submitting inquiry:", err);
