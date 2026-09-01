@@ -176,7 +176,7 @@ export default function Hero({
 
           <h1 data-headline className="display-tight font-display font-bold text-paper-50">
             <span className="mask-line block text-[8vw] italic font-normal text-paper-300 md:text-[3.4vw] lg:text-[2.6rem]">
-              <span data-headline-line className="mask-inner block">Journalist</span>
+              <span data-headline-line className="mask-inner block">Journalist &amp; Singer</span>
             </span>
             <span className="mask-line mt-1 block text-[13vw] md:text-[12vw] lg:text-[10.5rem]">
               <span data-headline-line className="mask-inner block">Aaditya Ajay</span>

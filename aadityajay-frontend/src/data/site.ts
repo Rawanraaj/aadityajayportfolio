@@ -1,11 +1,11 @@
 export const site = {
   name: "Aaditya Ajay",
-  role: "Chairman, Public Khabar 24",
+  role: "Journalist & Singer · Chairman, Public Khabar 24",
   tagline:
     "Reporting the stories that matter — from Nepal's streets to its front pages.",
   outlet: "Public Khabar 24",
   outletSite: "https://publickhabar24.com",
-  email: "press@aadityaajay.com",
+  email: "journalistaaditya786@gmail.com",
   socials: {
     facebook: "https://facebook.com/aadityaajay.pk24",
     twitter: "https://twitter.com/aadityaajay",
