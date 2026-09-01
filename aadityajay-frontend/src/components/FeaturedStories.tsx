@@ -47,7 +47,7 @@ export default function FeaturedStories({ articles = featuredArticles }: Feature
         if (!track) return;
         gsap.set(track, { x: 0 });
         if (!mq.matches) return;
-        const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth + 80);
+        const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
         const tween = gsap.to(track, {
           x: () => -getDistance(),
           ease: "none",
@@ -66,7 +66,11 @@ export default function FeaturedStories({ articles = featuredArticles }: Feature
       setup();
       const onResize = () => ScrollTrigger.refresh();
       window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
+      window.addEventListener("load", onResize);
+      return () => {
+        window.removeEventListener("resize", onResize);
+        window.removeEventListener("load", onResize);
+      };
     }, root);
     return () => ctx.revert();
   }, [filtered]);
