@@ -7,7 +7,7 @@ import SocialIcons from "@/components/SocialIcons";
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="grain-overlay relative border-t border-paper-50/15 bg-ink-950 py-14">
+    <footer className="grain-overlay relative overflow-hidden border-t border-paper-50/15 bg-ink-950 py-14">
       <div className="mx-auto max-w-editorial px-6 md:px-10">
         <div className="grid grid-cols-12 gap-y-10">
           <div className="col-span-12 md:col-span-5">

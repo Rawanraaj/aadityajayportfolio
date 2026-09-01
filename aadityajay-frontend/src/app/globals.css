@@ -47,6 +47,11 @@ body {
   line-height: 0.9;
 }
 
+.grain-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
 .grain-overlay::before {
   content: "";
   position: absolute;
